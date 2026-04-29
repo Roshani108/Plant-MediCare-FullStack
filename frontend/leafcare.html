@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeafCare — Plant Hospital</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--forest:#1a2e1a;--moss:#2d4a2d;--sage:#6b8f6b;--mint:#a8c5a0;--cream:#f5f0e8;--parchment:#ede5d4;--gold:#c9a84c;--white:#fafaf7;--shadow:rgba(26,46,26,0.15);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--forest);}
+
+/* AUTH */
+#AUTH{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#1a2e1a,#2d4a2d);display:flex;align-items:center;justify-content:center;padding:20px;}
+.AC{background:var(--white);border-radius:24px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.AL{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--forest);text-align:center;margin-bottom:4px;}
+.AL span{color:var(--sage);}
+.AS{text-align:center;font-size:.82rem;color:var(--sage);margin-bottom:22px;}
+.ATabs{display:flex;background:var(--parchment);border-radius:10px;padding:4px;margin-bottom:18px;}
+.ATab{flex:1;padding:10px;border:none;background:transparent;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;color:var(--sage);}
+.ATab.on{background:var(--white);color:var(--forest);box-shadow:0 1px 4px var(--shadow);}
+.APanel{display:none;}.APanel.on{display:block;}
+.F{margin-bottom:13px;}
+.F label{display:block;font-size:.72rem;font-weight:500;color:var(--moss);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
+.F input{width:100%;padding:11px 13px;border:1.5px solid var(--parchment);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--forest);outline:none;}
+.F input:focus{border-color:var(--sage);}
+.ABt{width:100%;padding:13px;background:var(--forest);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;margin-top:4px;}
+.ABt:hover{background:var(--moss);}
+.AErr{background:#fce4ec;color:#c62828;padding:9px 12px;border-radius:8px;font-size:.82rem;margin-bottom:11px;display:none;}
+
+/* APP */
+#APP{display:none;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(245,240,232,.96);backdrop-filter:blur(10px);border-bottom:1px solid rgba(107,143,107,.15);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.NL{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--forest);}
+.NL span{color:var(--sage);}
+.NLs{display:flex;gap:22px;list-style:none;}
+.NLs a{font-size:.8rem;font-weight:500;color:var(--moss);text-transform:uppercase;letter-spacing:.04em;cursor:pointer;text-decoration:none;}
+.NLs a:hover{color:var(--gold);}
+.NR{display:flex;align-items:center;gap:10px;}
+#NU{font-size:.82rem;color:var(--sage);}
+.NOt{background:none;border:1px solid var(--parchment);color:var(--forest);padding:7px 14px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;}
+
+.hero{min-height:100vh;background:linear-gradient(160deg,#1a2e1a,#2d4a2d,#3a5e3a);display:flex;align-items:center;padding:90px 5% 60px;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5vw,4.5rem);color:#f5f0e8;line-height:1.1;margin-bottom:14px;}
+.hero h1 em{color:#a8c5a0;font-style:italic;}
+.hero p{font-size:1rem;color:rgba(245,240,232,.68);line-height:1.7;max-width:460px;margin-bottom:28px;}
+.HBs{display:flex;gap:12px;flex-wrap:wrap;}
+.BGo{background:#c9a84c;color:#1a2e1a;border:none;padding:12px 26px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:500;cursor:pointer;}
+.BGh{background:transparent;color:#a8c5a0;border:1px solid rgba(168,197,160,.4);padding:12px 26px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.92rem;cursor:pointer;}
+
+section{padding:68px 5%;}
+.ST{font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);margin-bottom:8px;}
+h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);color:var(--forest);margin-bottom:10px;}
+
+/* DIAGNOSE */
+.DS{background:var(--cream);}
+.DG{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:32px;}
+
+/* UPLOAD */
+.UB{border:2px dashed var(--mint);border-radius:18px;background:var(--white);padding:28px;text-align:center;}
+.UI{font-size:2.6rem;margin-bottom:10px;}
+.UB h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--forest);margin-bottom:4px;}
+.UB p{font-size:.8rem;color:var(--sage);line-height:1.5;}
+.UL{display:inline-block;margin-top:14px;padding:9px 22px;background:var(--forest);color:var(--cream);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.86rem;cursor:pointer;}
+.UL:hover{background:var(--moss);}
+#FI{display:none;}
+#FN{font-size:.8rem;color:var(--moss);margin-top:8px;font-weight:500;min-height:18px;}
+#PI{width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-top:12px;display:none;}
+.PS{width:100%;padding:9px 12px;margin-top:12px;border:1.5px solid var(--parchment);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--forest);background:var(--white);outline:none;}
+#RB{width:100%;margin-top:10px;padding:13px;background:var(--moss);color:var(--cream);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:500;cursor:pointer;display:none;}
+#RB:hover{background:var(--forest);}
+
+/* RESULTS */
+.RBox{background:var(--white);border-radius:18px;padding:24px;min-height:340px;box-shadow:0 4px 20px var(--shadow);display:flex;flex-direction:column;}
+.RE{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--sage);}
+.REI{font-size:3rem;margin-bottom:10px;opacity:.35;}
+#RS{display:none;text-align:center;padding:40px 20px;}
+.SP{width:42px;height:42px;border:3px solid var(--mint);border-top-color:var(--forest);border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#RS p{color:var(--sage);font-size:.86rem;}
+#RD{display:none;overflow-y:auto;max-height:480px;}
+
+.RT{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--forest);}
+.RDe{font-size:.8rem;color:var(--sage);margin-top:3px;line-height:1.5;}
+.RBa{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.66rem;font-weight:500;text-transform:uppercase;margin:5px 0;}
+.RL{background:#e8f5e9;color:#2e7d32;}.RM{background:#fff8e1;color:#f57f17;}.RH{background:#fce4ec;color:#c62828;}
+.RBar{height:4px;background:var(--parchment);border-radius:2px;margin-top:6px;}
+.RBF{height:4px;background:var(--sage);border-radius:2px;}
+.RLb{font-size:.7rem;color:var(--sage);margin-top:2px;}
+.RDv{border:none;border-top:1px solid var(--parchment);margin:12px 0;}
+.RTbs{display:flex;gap:3px;background:var(--parchment);padding:3px;border-radius:9px;margin-bottom:12px;}
+.RTb{flex:1;padding:7px;border:none;background:transparent;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;cursor:pointer;color:var(--sage);}
+.RTb.on{background:var(--white);color:var(--forest);box-shadow:0 1px 3px var(--shadow);}
+.RTP{display:none;}.RTP.on{display:block;}
+.RST{display:flex;gap:10px;margin-bottom:10px;padding:10px;background:var(--parchment);border-radius:9px;}
+.RSN{width:22px;height:22px;background:var(--forest);color:var(--cream);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:500;flex-shrink:0;}
+.RSTx{font-size:.8rem;line-height:1.55;color:var(--moss);}
+.RSTx strong{color:var(--forest);display:block;margin-bottom:1px;}
+.RPr{display:flex;gap:9px;padding:10px;border:1px solid var(--parchment);border-radius:9px;margin-bottom:9px;}
+.RPE{font-size:1.7rem;flex-shrink:0;}
+.RPN{font-weight:500;font-size:.86rem;}
+.RPD{font-size:.74rem;color:var(--sage);margin-top:2px;line-height:1.5;}
+.RPT{display:inline-block;padding:2px 7px;border-radius:100px;font-size:.64rem;font-weight:500;margin-top:3px;background:var(--parchment);color:var(--sage);}
+.RDI{padding:10px;border-left:3px solid var(--mint);margin-bottom:9px;background:rgba(168,197,160,.06);border-radius:0 9px 9px 0;}
+.RDI h4{font-size:.82rem;color:var(--forest);margin-bottom:2px;}
+.RDI p{font-size:.76rem;color:var(--sage);line-height:1.55;}
+.RPV{padding:9px 11px;background:#f0f7ee;border-radius:7px;font-size:.77rem;color:var(--moss);margin-top:7px;}
+.RER{background:#fce4ec;border-radius:12px;padding:18px;color:#c62828;font-size:.83rem;line-height:1.7;}
+
+/* PLANTS */
+.PLS{background:var(--forest);}
+.PLS h2{color:#f5f0e8;}
+.PLS .ST{color:var(--mint);}
+.PLS>p{color:rgba(245,240,232,.6);font-size:.88rem;margin-bottom:6px;}
+.PG{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:14px;margin-top:24px;}
+.PC{background:rgba(255,255,255,.07);border:1px solid rgba(168,197,160,.14);border-radius:13px;padding:16px;}
+.PC:hover{background:rgba(255,255,255,.11);}
+.PCI{font-size:1.9rem;margin-bottom:7px;}
+.PCN{font-weight:500;color:#f5f0e8;margin-bottom:2px;font-size:.92rem;}
+.PCS{font-size:.73rem;color:var(--mint);}
+.PCBs{display:flex;gap:5px;margin-top:9px;}
+.PCB{flex:1;padding:5px;border:none;border-radius:5px;font-size:.68rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.PCBW{background:rgba(127,179,200,.2);color:#a8c5a0;}
+.PCBD{background:rgba(181,82,42,.14);color:#b5522a;}
+.PHB{height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:9px;}
+.PHF{height:3px;border-radius:2px;}
+.ADD{border:2px dashed rgba(168,197,160,.18);border-radius:13px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;cursor:pointer;color:rgba(168,197,160,.4);background:transparent;width:100%;font-family:'DM Sans',sans-serif;}
+.ADD:hover{border-color:var(--mint);color:var(--mint);}
+
+/* HISTORY */
+.HS{background:var(--parchment);}
+.HL{margin-top:24px;display:flex;flex-direction:column;gap:10px;}
+.HC{background:var(--white);border-radius:13px;padding:14px;display:flex;gap:12px;box-shadow:0 2px 7px var(--shadow);}
+.HI{width:56px;height:56px;border-radius:9px;object-fit:cover;background:var(--parchment);flex-shrink:0;}
+.HD{font-family:'Playfair Display',serif;font-size:.92rem;color:var(--forest);}
+.HM{font-size:.73rem;color:var(--sage);margin-top:2px;}
+.HE{text-align:center;padding:32px;color:var(--sage);font-size:.88rem;}
+
+/* TIPS */
+.TG{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:24px;}
+.TC{background:var(--white);padding:22px;border-radius:13px;border:1px solid rgba(107,143,107,.1);}
+.TC:hover{box-shadow:0 6px 20px var(--shadow);}
+.TI{font-size:1.7rem;margin-bottom:9px;}
+.TC h3{font-family:'Playfair Display',serif;font-size:.92rem;color:var(--forest);margin-bottom:5px;}
+.TC p{font-size:.78rem;color:var(--sage);line-height:1.65;}
+
+/* MODAL */
+.MB{position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.MB.on{display:flex;}
+.Mo{background:var(--white);border-radius:18px;padding:30px;width:100%;max-width:390px;}
+.Mo h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--forest);margin-bottom:16px;}
+.MF{margin-bottom:12px;}
+.MF label{display:block;font-size:.7rem;font-weight:500;color:var(--moss);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;}
+.MF input,.MF select,.MF textarea{width:100%;padding:9px 12px;border:1.5px solid var(--parchment);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--forest);background:var(--white);outline:none;}
+.MF input:focus,.MF select:focus{border-color:var(--sage);}
+.MBs{display:flex;gap:9px;margin-top:16px;}
+.MS{flex:1;padding:11px;background:var(--forest);color:var(--cream);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;}
+.MC{padding:11px 16px;background:var(--parchment);color:var(--moss);border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;}
+
+/* TOAST */
+.Tst{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--forest);color:var(--cream);padding:9px 18px;border-radius:100px;font-size:.8rem;opacity:0;transition:all .25s;pointer-events:none;z-index:9999;white-space:nowrap;}
+.Tst.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{background:var(--forest);color:rgba(245,240,232,.45);padding:32px 5% 22px;text-align:center;}
+.FL{font-family:'Playfair Display',serif;color:#f5f0e8;font-size:1.2rem;margin-bottom:5px;}
+
+@media(max-width:768px){.NLs{display:none;}.DG{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="AUTH">
+  <div class="AC">
+    <div class="AL">🌿 Leaf<span>Care</span></div>
+    <p class="AS">Your Plant's Personal Hospital</p>
+    <div class="ATabs">
+      <button class="ATab on" onclick="sTab('login',this)">Login</button>
+      <button class="ATab" onclick="sTab('reg',this)">Sign Up</button>
+    </div>
+    <div class="AErr" id="AErr"></div>
+    <div class="APanel on" id="loginPanel">
+      <div class="F"><label>Email</label><input type="email" id="LE" placeholder="your@email.com"></div>
+      <div class="F"><label>Password</label><input type="password" id="LP" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="ABt" onclick="doLogin()">Login →</button>
+    </div>
+    <div class="APanel" id="regPanel">
+      <div class="F"><label>Full Name</label><input type="text" id="RN" placeholder="Your Name"></div>
+      <div class="F"><label>Email</label><input type="email" id="RE" placeholder="your@email.com"></div>
+      <div class="F"><label>Password</label><input type="password" id="RP" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doReg()"></div>
+      <button class="ABt" onclick="doReg()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="APP">
+<nav>
+  <div class="NL">🌿 Leaf<span>Care</span></div>
+  <ul class="NLs">
+    <li><a onclick="sc('DS')">Diagnose</a></li>
+    <li><a onclick="sc('PS')">My Plants</a></li>
+    <li><a onclick="sc('HS')">History</a></li>
+    <li><a onclick="sc('TS')">Tips</a></li>
+  </ul>
+  <div class="NR"><span id="NU"></span><button class="NOt" onclick="doOut()">Logout</button></div>
+</nav>
+
+<section class="hero">
+  <div>
+    <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(168,197,160,.14);border:1px solid rgba(168,197,160,.3);color:#a8c5a0;padding:5px 13px;border-radius:100px;font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">🔬 Your Trained AI Model</div>
+    <h1>Heal Every<br><em>Sick Leaf</em><br>With Precision</h1>
+    <p>Upload a plant photo — your AI model identifies the disease and gives you a complete treatment plan with product picks and DIY remedies.</p>
+    <div class="HBs">
+      <button class="BGo" onclick="sc('DS')">📸 Diagnose Now</button>
+      <button class="BGh" onclick="sc('PS')">My Plants →</button>
+    </div>
+  </div>
+</section>
+
+<section class="DS" id="DS">
+  <div class="ST">AI Diagnosis</div>
+  <h2>Upload &amp; Heal Your Plant</h2>
+  <p style="color:var(--sage);font-size:.9rem;line-height:1.7;max-width:460px">Click the green button below to choose a plant photo, then click Run Diagnosis.</p>
+  <div class="DG">
+    <div>
+      <div class="UB">
+        <div class="UI">📷</div>
+        <h3>Plant Photo</h3>
+        <p>JPG, PNG or WEBP · Max 5MB</p>
+        <label class="UL" for="FI">📂 Choose Photo</label>
+        <input type="file" id="FI" accept="image/jpeg,image/jpg,image/png,image/webp" style="display:none">
+        <div id="FN"></div>
+        <img id="PI" alt="preview">
+      </div>
+      <select class="PS" id="PSel"></select>
+      <button id="RB" onclick="runDx()">🔬 Run Diagnosis</button>
+    </div>
+    <div class="RBox">
+      <div class="RE" id="RE"><div class="REI">🌱</div><p style="font-size:.86rem;max-width:190px;line-height:1.55">Choose a photo and click Run Diagnosis to get results</p></div>
+      <div id="RS"><div class="SP"></div><p id="RST">Analyzing your plant...</p></div>
+      <div id="RD"></div>
+    </div>
+  </div>
+</section>
+
+<section class="PLS" id="PS">
+  <div class="ST">My Garden</div>
+  <h2>Plant Health Tracker</h2>
+  <p>Track health, watering and diagnoses for every plant.</p>
+  <div class="PG" id="PG"><p style="color:rgba(245,240,232,.35);font-size:.86rem">Loading your plants...</p></div>
+</section>
+
+<section class="HS" id="HS">
+  <div class="ST">Past Diagnoses</div>
+  <h2>Diagnosis History</h2>
+  <p style="color:var(--sage);font-size:.9rem">All your diagnoses saved with photos and treatment plans.</p>
+  <div class="HL" id="HL"><div class="HE">No diagnoses yet — upload a photo above</div></div>
+</section>
+
+<section id="TS">
+  <div class="ST">Expert Knowledge</div>
+  <h2>Plant Care Wisdom</h2>
+  <div class="TG">
+    <div class="TC"><div class="TI">💧</div><h3>The Finger Test</h3><p>Push finger 2 inches into soil. Only water when dry at that depth. Overwatering kills more plants than underwatering.</p></div>
+    <div class="TC"><div class="TI">☀️</div><h3>Light Reading</h3><p>"Bright indirect light" = 3–5 feet from a window. Most houseplants thrive here, never in direct sun.</p></div>
+    <div class="TC"><div class="TI">🧴</div><h3>Neem Oil Cure-All</h3><p>2ml neem oil per litre water treats most fungal diseases, mites and aphids organically.</p></div>
+    <div class="TC"><div class="TI">✂️</div><h3>Prune for Power</h3><p>Remove yellow or dead leaves immediately — they drain energy and harbour fungal spores.</p></div>
+    <div class="TC"><div class="TI">🪣</div><h3>Drainage First</h3><p>Always use pots with drainage holes. Standing water for 30+ minutes creates root rot conditions.</p></div>
+    <div class="TC"><div class="TI">🌡️</div><h3>Temperature Shock</h3><p>Most plants suffer below 13°C. Keep away from AC vents, cold windows and heaters.</p></div>
+  </div>
+</section>
+
+<footer><div class="FL">🌿 LeafCare</div><br><small>Node.js · Express · MongoDB · Your Trained AI Model</small></footer>
+</div>
+
+<!-- ADD PLANT MODAL -->
+<div class="MB" id="AM">
+  <div class="Mo">
+    <h3>🌱 Add a Plant</h3>
+    <div class="MF"><label>Name *</label><input type="text" id="MN" placeholder="e.g. My Rose Bush"></div>
+    <div class="MF"><label>Species</label><input type="text" id="MSp" placeholder="e.g. Rosa damascena"></div>
+    <div class="MF"><label>Location</label><select id="MLo"><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="balcony">Balcony</option><option value="garden">Garden</option></select></div>
+    <div class="MF"><label>Emoji</label><input type="text" id="ME" placeholder="🪴" maxlength="2" style="width:54px;font-size:1.25rem"></div>
+    <div class="MF"><label>Notes</label><textarea id="MNo" rows="2" style="resize:none"></textarea></div>
+    <div class="MBs"><button class="MC" onclick="cModal()">Cancel</button><button class="MS" onclick="svPlant()">Save Plant</button></div>
+  </div>
+</div>
+
+<div class="Tst" id="TST"></div>
+
+<script>
+var API='http://localhost:5000/api', tok='', myPlants=[], selF=null, sTmr=null;
+
+function q(id){return document.getElementById(id);}
+function sc(id){q(id).scrollIntoView({behavior:'smooth'});}
+
+function toast(m,ms){
+  var t=q('TST');t.textContent=m;t.classList.add('on');
+  setTimeout(function(){t.classList.remove('on');},ms||2500);
+}
+
+// AUTH
+function sTab(n,b){
+  document.querySelectorAll('.ATab').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.APanel').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');q(n+'Panel').classList.add('on');
+  q('AErr').style.display='none';
+}
+function aerr(m){var e=q('AErr');e.textContent=m;e.style.display='block';}
+
+async function doLogin(){
+  var em=q('LE').value.trim(),pw=q('LP').value;
+  if(!em||!pw){aerr('Please fill in all fields');return;}
+  try{
+    var r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw})});
+    var d=await r.json();
+    if(!r.ok){aerr(d.message||'Login failed');return;}
+    tok=d.token;localStorage.setItem('lct',tok);localStorage.setItem('lcu',JSON.stringify(d.user));
+    boot(d.user);
+  }catch(e){aerr('Cannot connect to backend. Is npm run dev running?');}
+}
+
+async function doReg(){
+  var nm=q('RN').value.trim(),em=q('RE').value.trim(),pw=q('RP').value;
+  if(!nm||!em||!pw){aerr('Please fill in all fields');return;}
+  if(pw.length<6){aerr('Password must be at least 6 characters');return;}
+  try{
+    var r=await fetch(API+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm,email:em,password:pw})});
+    var d=await r.json();
+    if(!r.ok){aerr(d.message||'Registration failed');return;}
+    tok=d.token;localStorage.setItem('lct',tok);localStorage.setItem('lcu',JSON.stringify(d.user));
+    boot(d.user);
+  }catch(e){aerr('Cannot connect to backend. Is npm run dev running?');}
+}
+
+function doOut(){
+  tok='';localStorage.removeItem('lct');localStorage.removeItem('lcu');
+  q('APP').style.display='none';q('AUTH').style.display='flex';
+}
+
+function boot(u){
+  q('AUTH').style.display='none';q('APP').style.display='block';
+  q('NU').textContent='Hi, '+(u&&u.name?u.name.split(' ')[0]:'Gardener')+' 👋';
+  loadPlants();loadHistory();
+}
+
+// FILE INPUT
+q('FI').onchange=function(){
+  var f=this.files[0];if(!f)return;
+  selF=f;
+  q('FN').textContent='✅ '+f.name;
+  var rd=new FileReader();
+  rd.onload=function(e){q('PI').src=e.target.result;q('PI').style.display='block';};
+  rd.readAsDataURL(f);
+  q('RB').style.display='block';
+};
+
+// DIAGNOSIS
+var SM=['Analyzing leaf patterns...','Identifying symptoms...','Matching disease database...','Preparing treatment plan...'];
+
+async function runDx(){
+  if(!selF){toast('Please choose a photo first!');return;}
+  if(!tok){toast('Please login first!');return;}
+  q('RE').style.display='none';q('RD').style.display='none';q('RD').innerHTML='';q('RS').style.display='block';
+  var si=0;sTmr=setInterval(function(){q('RST').textContent=SM[si++%SM.length];},1200);
+  var pid=q('PSel').value||null;
+  var fm=new FormData();fm.append('image',selF);if(pid)fm.append('plantId',pid);
+  try{
+    var r=await fetch(API+'/diagnose',{method:'POST',headers:{'Authorization':'Bearer '+tok},body:fm});
+    var d=await r.json();
+    clearInterval(sTmr);q('RS').style.display='none';
+    if(!r.ok){rErr(d.message||'Diagnosis failed ('+r.status+')');return;}
+    if(!d.data){rErr('Empty response from server');return;}
+    rShow(d.data);loadHistory();if(pid)loadPlants();
+  }catch(e){
+    clearInterval(sTmr);q('RS').style.display='none';
+    rErr('Network error: '+e.message);
+  }
+}
+
+function rErr(m){
+  var x=q('RD');
+  x.innerHTML='<div class="RER"><strong>❌ Error</strong><br><br>'+m+'<br><br><small>Make sure:<br>1. npm run dev is running<br>2. MongoDB is started<br>3. Try logging out and back in</small></div>';
+  x.style.display='block';
+}
+
+function rShow(d){
+  var sc=d.severity==='high'?'RH':d.severity==='medium'?'RM':'RL';
+  var sl=d.severity==='high'?'🚨 Severe':d.severity==='medium'?'⚠️ Moderate':'✅ Mild';
+  var cf=d.confidence||0;
+  var tr=(d.treatments||[]).map(function(t,i){
+    return '<div class="RST"><div class="RSN">'+(i+1)+'</div><div class="RSTx"><strong>'+t.step+'</strong>'+t.detail+'</div></div>';
+  }).join('')||'<p style="color:var(--sage);font-size:.8rem">No steps listed.</p>';
+  var pr=(d.products||[]).map(function(p){
+    return '<div class="RPr"><div class="RPE">'+(p.emoji||'🧴')+'</div><div><div class="RPN">'+p.name+'</div><div class="RPD">'+p.description+'</div><span class="RPT">'+p.type+'</span></div></div>';
+  }).join('')||'<p style="color:var(--sage);font-size:.8rem">No products listed.</p>';
+  var di=(d.diy||[]).map(function(x){
+    return '<div class="RDI"><h4>🌿 '+x.title+'</h4><p>'+x.instructions+'</p></div>';
+  }).join('')||'<p style="color:var(--sage);font-size:.8rem">No DIY remedies listed.</p>';
+  var pv=d.prevention?'<div class="RPV"><strong>💡 Prevention:</strong> '+d.prevention+'</div>':'';
+  q('RD').innerHTML=
+    '<div class="RT">'+d.disease+'</div>'+
+    '<span class="RBa '+sc+'">'+sl+'</span>'+
+    '<div class="RDe">'+(d.description||'')+'</div>'+
+    '<div class="RBar"><div class="RBF" style="width:'+cf+'%"></div></div>'+
+    '<div class="RLb">Confidence: '+cf+'% &nbsp;·&nbsp; Recovery: '+(d.recoveryTime||'Varies')+'</div>'+
+    '<hr class="RDv">'+
+    '<div class="RTbs">'+
+      '<button class="RTb on" onclick="rTab(this,\'TP1\')">Treatment</button>'+
+      '<button class="RTb" onclick="rTab(this,\'TP2\')">Products</button>'+
+      '<button class="RTb" onclick="rTab(this,\'TP3\')">DIY Cures</button>'+
+    '</div>'+
+    '<div class="RTP on" id="TP1">'+tr+pv+'</div>'+
+    '<div class="RTP" id="TP2">'+pr+'</div>'+
+    '<div class="RTP" id="TP3">'+di+'</div>';
+  q('RD').style.display='block';
+}
+
+function rTab(b,p){
+  document.querySelectorAll('.RTb').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.RTP').forEach(function(x){x.classList.remove('on');});
+  b.classList.add('on');q(p).classList.add('on');
+}
+
+// PLANTS
+async function loadPlants(){
+  try{
+    var r=await fetch(API+'/plants',{headers:{'Authorization':'Bearer '+tok}});
+    var d=await r.json();if(!r.ok)return;
+    myPlants=d.data||[];renderPlants();fillSel();
+  }catch(e){console.error('loadPlants:',e);}
+}
+
+function renderPlants(){
+  var g=q('PG'),h='';
+  myPlants.forEach(function(p){
+    var c=p.healthStatus==='healthy'?'#a8c5a0':p.healthStatus==='warning'?'#c9a84c':'#b5522a';
+    var s=p.healthStatus==='healthy'?'✓ Healthy':p.healthStatus==='warning'?'⚠ Needs attention':'🚨 Critical';
+    h+='<div class="PC">'+
+      '<div class="PCI">'+(p.emoji||'🪴')+'</div>'+
+      '<div class="PCN">'+p.name+'</div>'+
+      '<div class="PCS">'+s+'</div>'+
+      '<div class="PCBs">'+
+        '<button class="PCB PCBW" onclick="wPlant(\''+p._id+'\')">💧 Watered</button>'+
+        '<button class="PCB PCBD" onclick="dPlant(\''+p._id+'\',\''+p.name+'\')">🗑 Remove</button>'+
+      '</div>'+
+      '<div class="PHB"><div class="PHF" style="width:'+(p.healthScore||80)+'%;background:'+c+'"></div></div>'+
+    '</div>';
+  });
+  h+='<button class="ADD" onclick="q(\'AM\').classList.add(\'on\')"><div style="font-size:1.9rem;margin-bottom:5px">＋</div><span style="font-size:.8rem">Add a Plant</span></button>';
+  g.innerHTML=h;
+}
+
+function fillSel(){
+  var s=q('PSel');s.innerHTML='<option value="">— Link to a plant (optional) —</option>';
+  myPlants.forEach(function(p){s.innerHTML+='<option value="'+p._id+'">'+(p.emoji||'🪴')+' '+p.name+'</option>';});
+}
+
+async function wPlant(id){
+  try{await fetch(API+'/plants/'+id+'/water',{method:'PUT',headers:{'Authorization':'Bearer '+tok}});toast('💧 Watering logged!');loadPlants();}
+  catch(e){toast('Error');}
+}
+
+async function dPlant(id,nm){
+  if(!confirm('Remove "'+nm+'"?'))return;
+  try{await fetch(API+'/plants/'+id,{method:'DELETE',headers:{'Authorization':'Bearer '+tok}});toast('Plant removed');loadPlants();loadHistory();}
+  catch(e){toast('Error');}
+}
+
+function cModal(){q('AM').classList.remove('on');}
+
+async function svPlant(){
+  var nm=q('MN').value.trim();if(!nm){toast('Please enter a plant name');return;}
+  var fm=new FormData();
+  fm.append('name',nm);fm.append('species',q('MSp').value);fm.append('location',q('MLo').value);
+  fm.append('emoji',q('ME').value||'🪴');fm.append('notes',q('MNo').value);
+  try{
+    var r=await fetch(API+'/plants',{method:'POST',headers:{'Authorization':'Bearer '+tok},body:fm});
+    var d=await r.json();if(!r.ok){toast('Error: '+d.message);return;}
+    toast('🌱 Plant added!');cModal();
+    q('MN').value='';q('MSp').value='';q('ME').value='';q('MNo').value='';
+    loadPlants();
+  }catch(e){toast('Error saving plant');}
+}
+
+// HISTORY
+async function loadHistory(){
+  try{
+    var r=await fetch(API+'/diagnose/history',{headers:{'Authorization':'Bearer '+tok}});
+    var d=await r.json();if(!r.ok)return;
+    var list=q('HL'),ds=d.data||[];
+    if(!ds.length){list.innerHTML='<div class="HE">No diagnoses yet — upload a photo above</div>';return;}
+    list.innerHTML=ds.map(function(d){
+      var sc=d.severity==='high'?'RH':d.severity==='medium'?'RM':'RL';
+      var dt=new Date(d.diagnosedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      return '<div class="HC">'+
+        '<img class="HI" src="http://localhost:5000'+d.imageUrl+'" onerror="this.style.background=\'var(--parchment)\'" alt="">'+
+        '<div><div class="HD">'+d.disease+'</div>'+
+        '<div class="HM">'+dt+' &nbsp;<span class="RBa '+sc+'" style="font-size:.62rem">'+d.severity+'</span></div>'+
+        (d.plant?'<div style="font-size:.76rem;color:var(--moss);margin-top:3px">'+(d.plant.emoji||'🪴')+' '+d.plant.name+'</div>':'')+
+        '</div></div>';
+    }).join('');
+  }catch(e){console.error('loadHistory:',e);}
+}
+
+// INIT - auto login if token exists
+(function(){
+  var t=localStorage.getItem('lct'),u=localStorage.getItem('lcu');
+  if(t&&u){tok=t;boot(JSON.parse(u));}
+})();
+</script>
+</body>
+</html>
