@@ -290,7 +290,7 @@ footer{background:var(--forest);color:rgba(245,240,232,.45);padding:32px 5% 22px
 <div class="Tst" id="TST"></div>
 
 <script>
-var HOST = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000' : 'https://plant-hospital-api.onrender.com';
+var HOST = (window.location.protocol === 'file:') ? 'http://localhost:5000' : '';
 var API = HOST + '/api', tok='', myPlants=[], selF=null, sTmr=null;
 
 function q(id){return document.getElementById(id);}
