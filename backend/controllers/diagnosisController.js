@@ -1,8 +1,11 @@
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
+const mongoose = require('mongoose');
 const Diagnosis = require('../models/Diagnosis');
 const Plant = require('../models/Plant');
+
+const inMemoryDiagnoses = global._inMemoryDiagnoses || (global._inMemoryDiagnoses = []);
 
 // ── Disease Treatment Database ────────────────────────────────────────────────
 const DB = {
@@ -242,18 +245,23 @@ exports.diagnose = async (req, res) => {
       imageUrl: '/uploads/' + req.file.filename
     };
 
-    console.log("📝 Saving diagnosis to MongoDB...");
+    let diagnosis = diagnosisData;
+    if (mongoose.connection.readyState === 1) {
+      console.log("📝 Saving diagnosis to MongoDB...");
+      diagnosis = await Diagnosis.create(diagnosisData);
+      console.log("✅ Diagnosis saved successfully! ID:", diagnosis._id);
 
-    const diagnosis = await Diagnosis.create(diagnosisData);
-
-    console.log("✅ Diagnosis saved successfully! ID:", diagnosis._id);
-
-    // Update plant health if linked
-    if (plantId) {
-      const scoreMap = { low: 85, medium: 50, high: 20 };
-      await Plant.findByIdAndUpdate(plantId, { 
-        healthScore: scoreMap[treatment.severity] || 85 
-      });
+      // Update plant health if linked
+      if (plantId) {
+        const scoreMap = { low: 85, medium: 50, high: 20 };
+        await Plant.findByIdAndUpdate(plantId, { 
+          healthScore: scoreMap[treatment.severity] || 85 
+        });
+      }
+    } else {
+      diagnosis._id = 'diag_' + Date.now();
+      diagnosis.diagnosedAt = new Date();
+      inMemoryDiagnoses.unshift(diagnosis);
     }
 
     res.status(200).json({ 
@@ -274,10 +282,15 @@ exports.diagnose = async (req, res) => {
 // ── GET /api/diagnose/history ─────────────────────────────────────────────────
 exports.getHistory = async (req, res) => {
   try {
-    const diagnoses = await Diagnosis.find({ user: req.user.id })
-      .populate('plant', 'name emoji')
-      .sort('-diagnosedAt')
-      .limit(50);
+    const userId = req.user.id || req.user._id;
+    if (mongoose.connection.readyState === 1) {
+      const diagnoses = await Diagnosis.find({ user: userId })
+        .populate('plant', 'name emoji')
+        .sort('-diagnosedAt')
+        .limit(50);
+      return res.status(200).json({ success: true, count: diagnoses.length, data: diagnoses });
+    }
+    const diagnoses = inMemoryDiagnoses.filter(d => d.user === userId);
     res.status(200).json({ success: true, count: diagnoses.length, data: diagnoses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -287,7 +300,12 @@ exports.getHistory = async (req, res) => {
 // ── GET /api/diagnose/plant/:id ───────────────────────────────────────────────
 exports.getPlantDiagnoses = async (req, res) => {
   try {
-    const diagnoses = await Diagnosis.find({ plant: req.params.id, user: req.user.id }).sort('-diagnosedAt');
+    const userId = req.user.id || req.user._id;
+    if (mongoose.connection.readyState === 1) {
+      const diagnoses = await Diagnosis.find({ plant: req.params.id, user: userId }).sort('-diagnosedAt');
+      return res.status(200).json({ success: true, count: diagnoses.length, data: diagnoses });
+    }
+    const diagnoses = inMemoryDiagnoses.filter(d => d.plant === req.params.id && d.user === userId);
     res.status(200).json({ success: true, count: diagnoses.length, data: diagnoses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
